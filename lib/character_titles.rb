@@ -1,5 +1,3 @@
 require "character_titles/version"
-
-module CharacterTitles
-  # Your code goes here...
-end
+require "character_titles/place"
+require "character_titles/evil"

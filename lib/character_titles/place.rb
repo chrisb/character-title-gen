@@ -1,4 +1,4 @@
-module CharacterTitle
+module CharacterTitles
   module Place
     module_function
 
@@ -29,7 +29,7 @@ module CharacterTitle
 
     def generate
       place = should_modify? ? place_with_modifier : place_name
-      place = "#{place_adjectives.sample} #{place}" if should_add_adjective?
+      place = "#{ADJECTIVES.sample} #{place}" if should_add_adjective?
       "#{'the' if should_be_proper?} #{place}".strip
     end
   end
