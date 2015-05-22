@@ -1,8 +1,9 @@
-require 'active_support/all'
-
 module CharacterTitles
   module Evil
     module_function
+    extend Helpers
+
+    SILLY = false
 
     BODY_PARTS_SINGULAR    = %w(anus blood flesh skin fat death eye sight)
     BODY_PARTS             = %w(intestine colon gonad skull leg arm body head gut beast heart liver)
@@ -10,32 +11,21 @@ module CharacterTitles
     ADJECTIVES             = %w(evil dark rotting putrid forgotten terrible horrible nasty sickening putrifying banished outlawed)
     NOUNS                  = %w(scourage terror horror ghoul ghost beast outlaw criminal demon)
 
-    def qualifer_should_be_proper?
-      rand(3) == 1
-    end
-
     def qualifier
-      "#{'the ' if qualifer_should_be_proper?}#{NOUNS.sample} of #{CharacterTitles::Place.generate}"
+      "#{chance_of 'the'} #{NOUNS.sample} of #{CharacterTitles::Place.generate}"
     end
 
-    def pick_body_part
-      (BODY_PARTS_SINGULAR + BODY_PARTS).sample
+    def descriptor
+      body_part = (BODY_PARTS_SINGULAR + BODY_PARTS).sample
+      singular  = BODY_PARTS_SINGULAR.include? body_part
+
+      !singular && rand(2) == 1 ?
+        "#{VIOLENT_VERBS_AS_NOUNS.sample} of #{body_part.pluralize}" :
+        "#{body_part}#{word_separator}#{VIOLENT_VERBS_AS_NOUNS.sample}"
     end
 
     def generate
-      body_part = pick_body_part
-
-      title = if rand(2) == 1 && !BODY_PARTS_SINGULAR.include?(body_part)
-        "#{VIOLENT_VERBS_AS_NOUNS.sample} of #{body_part.pluralize}"
-      else
-        "#{body_part}#{['', '-', ' '].sample}#{VIOLENT_VERBS_AS_NOUNS.sample}"
-      end
-
-      title = "#{ADJECTIVES.sample} #{title}" if rand(3) == 1 # add an adjective to the title?
-      title = "the #{title}"                  if rand(3) == 1 # should the title be proper?
-      title = "#{title}, #{qualifier}"        if rand(2) == 1 # should it include a qualifier?
-
-      title.titleize.gsub('Of', 'of').gsub('The', 'the')
+      [chance_of('the'), chance_of(ADJECTIVES), descriptor, chance_of(", #{qualifier}", 0.5)].compact.join(' ').titleize_for_character
     end
   end
 end
